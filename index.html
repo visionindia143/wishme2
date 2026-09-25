@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Birthday Bow & Arrow</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at 10% 10%, #ffe7ef, transparent 30%),
+                radial-gradient(circle at 90% 90%, #fff0d9, transparent 35%),
+                #fffafa;
+        }
+
+        .birthday-game {
+            width: min(1100px, 100%);
+        }
+
+        .birthday-card {
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid #efd2dd;
+            border-radius: 34px;
+            padding: 28px 24px 26px;
+            box-shadow: 0 28px 80px rgba(155, 74, 104, 0.10);
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .small-title {
+            font-size: 12px;
+            letter-spacing: 4px;
+            font-weight: 800;
+            color: #a86479;
+            margin-bottom: 8px;
+        }
+
+        .heading h1 {
+            margin: 0;
+            font-size: clamp(34px, 6vw, 60px);
+            color: #482b35;
+            line-height: 1;
+        }
+
+        .heading p {
+            margin: 12px auto 0;
+            max-width: 700px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #846d76;
+        }
+
+        .game-area {
+            position: relative;
+            width: 100%;
+            max-width: 940px;
+            margin: 12px auto 0;
+        }
+
+        #gameSvg {
+            display: block;
+            width: 100%;
+            height: auto;
+            user-select: none;
+            touch-action: none;
+        }
+
+        /* Bow */
+        .bow-main {
+            fill: none;
+            stroke: #2d1b17;
+            stroke-width: 13;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .bow-highlight {
+            fill: none;
+            stroke: #9c6248;
+            stroke-width: 4;
+            stroke-linecap: round;
+            opacity: 0.8;
+        }
+
+        .bow-tip {
+            fill: #21120f;
+        }
+
+        .bow-tip-highlight {
+            fill: #9b644a;
+        }
+
+        .bow-handle {
+            fill: #4c2b23;
+            stroke: #251411;
+            stroke-width: 3;
+        }
+
+        .handle-line {
+            stroke: #b68972;
+            stroke-width: 2.3;
+            stroke-linecap: round;
+        }
+
+        .bow-string {
+            fill: none;
+            stroke: #3b3335;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Arrow */
+        .arrow-shaft {
+            stroke: #46373d;
+            stroke-width: 5;
+            stroke-linecap: round;
+        }
+
+        .arrow-head {
+            fill: #b83e5b;
+        }
+
+        .arrow-feather {
+            fill: #ed98ae;
+        }
+
+        .arrow-nock {
+            fill: #3d3035;
+        }
+
+        .drag-zone {
+            fill: transparent;
+            cursor: grab;
+        }
+
+        .drag-zone:active {
+            cursor: grabbing;
+        }
+
+        .aim-line {
+            stroke: #d5a5b4;
+            stroke-width: 2;
+            stroke-dasharray: 8 8;
+            opacity: 0;
+        }
+
+        .aim-line.show {
+            opacity: 0.9;
+        }
+
+        /* Heart */
+        .heart-ring {
+            fill: none;
+            stroke: #efb2c2;
+            stroke-width: 2;
+            opacity: 0.42;
+        }
+
+        .heart-main {
+            fill: #df5575;
+            stroke: #b23857;
+            stroke-width: 3;
+            filter: drop-shadow(0 12px 12px rgba(178, 56, 87, 0.18));
+        }
+
+        .heart-center {
+            fill: #ffd1dc;
+        }
+
+        /* Labels */
+        .small-label {
+            font-size: 11px;
+            font-weight: 800;
+            fill: #9b818a;
+        }
+
+        .main-label {
+            font-size: 13px;
+            font-weight: 800;
+            fill: #715961;
+        }
+
+        /* Power */
+        .power-bg {
+            fill: #eadce1;
+        }
+
+        .power-fill {
+            fill: #d75a78;
+        }
+
+        .status {
+            min-height: 22px;
+            text-align: center;
+            margin-top: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #896b76;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .game-btn {
+            border: 0;
+            min-height: 46px;
+            padding: 0 24px;
+            border-radius: 100px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 800;
+            transition: 0.25s ease;
+        }
+
+        .shoot-button {
+            color: white;
+            background: linear-gradient(135deg, #ef86a2, #d94269);
+            box-shadow: 0 10px 25px rgba(215, 66, 105, 0.23);
+        }
+
+        .reset-button {
+            color: #674f58;
+            background: #ffffff;
+            border: 1px solid #ead7de;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .message-section {
+            display: grid;
+            place-items: center;
+            min-height: 150px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .locked-message {
+            font-size: 14px;
+            color: #8d747d;
+        }
+
+        .birthday-message {
+            display: none;
+        }
+
+        .birthday-message.show {
+            display: block;
+            animation: birthdayPop 0.7s cubic-bezier(.2, .9, .25, 1);
+        }
+
+        .birthday-message h2 {
+            margin: 0;
+            font-size: clamp(42px, 8vw, 76px);
+            line-height: 0.95;
+            color: #c93e62;
+            letter-spacing: -3px;
+            text-shadow: 0 5px 0 #ffdde6;
+        }
+
+        .birthday-message p {
+            max-width: 680px;
+            margin: 12px auto 0;
+            font-size: 15px;
+            line-height: 1.55;
+            color: #725a64;
+        }
+
+        .cake {
+            display: block;
+            font-size: 48px;
+            margin-top: 5px;
+        }
+
+        @keyframes birthdayPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.6) translateY(20px);
+            }
+            65% {
+                opacity: 1;
+                transform: scale(1.08);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .birthday-game.hit .heart-main {
+            animation: heartGlowHit 0.7s cubic-bezier(.2, .9, .25, 1);
+        }
+
+        @keyframes heartGlowHit {
+            0% {
+                filter: drop-shadow(0 12px 12px rgba(178, 56, 87, 0.18));
+            }
+            35% {
+                filter: drop-shadow(0 0 22px rgba(223, 85, 117, 0.55));
+            }
+            100% {
+                filter: drop-shadow(0 10px 16px rgba(178, 56, 87, 0.26));
+            }
+        }
+
+        .confetti-container {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 9px;
+            height: 14px;
+            border-radius: 2px;
+            opacity: 0;
+            animation: confettiAnimation 1.5s ease-out forwards;
+        }
+
+        @keyframes confettiAnimation {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--move-x), var(--move-y)) rotate(var(--rotate));
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 8px;
+            }
+
+            .birthday-card {
+                padding: 18px 10px 20px;
+            }
+
+            .heading p {
+                font-size: 12px;
+            }
+
+            .status {
+                font-size: 12px;
+            }
+
+            .game-btn {
+                min-height: 44px;
+                padding: 0 18px;
+            }
+        }
+
+
+        /* Birthday hit overlay */
+        .birthday-surprise-overlay {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 22px;
+            background: rgba(255, 248, 251, 0.86);
+            backdrop-filter: blur(7px);
+            -webkit-backdrop-filter: blur(7px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 20;
+            transition: opacity .28s ease, visibility .28s ease;
+        }
+
+        .birthday-surprise-overlay.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .birthday-surprise-card {
+            width: min(560px, 92%);
+            text-align: center;
+            background: linear-gradient(180deg, #ffffff 0%, #fff3f7 100%);
+            border: 1px solid #f2cbd8;
+            border-radius: 32px;
+            padding: 30px 24px 26px;
+            box-shadow: 0 24px 80px rgba(168, 64, 96, .22);
+            transform: translateY(26px) scale(.75);
+            opacity: 0;
+        }
+
+        .birthday-surprise-overlay.show .birthday-surprise-card {
+            animation: surpriseCardPop .78s cubic-bezier(.18,.9,.25,1.18) forwards;
+        }
+
+        .birthday-surprise-kicker {
+            font-size: 12px;
+            letter-spacing: 4px;
+            font-weight: 900;
+            color: #a86479;
+            margin-bottom: 10px;
+        }
+
+        .birthday-surprise-title {
+            margin: 0;
+            font-size: clamp(38px, 7vw, 70px);
+            line-height: .98;
+            letter-spacing: -2px;
+            color: #c93e62;
+            text-shadow: 0 5px 0 #ffe0e9;
+        }
+
+        .birthday-name {
+            display: block;
+            margin-top: 6px;
+            color: #7d3d59;
+        }
+
+        .birthday-cake-wrap {
+            position: relative;
+            display: inline-grid;
+            place-items: center;
+            margin: 18px auto 10px;
+            width: 118px;
+            height: 118px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff 0 44%, #ffe1eb 45% 67%, transparent 68%);
+            animation: cakeFloat 2.2s ease-in-out infinite;
+        }
+
+        .birthday-cake-main {
+            font-size: 76px;
+            line-height: 1;
+            filter: drop-shadow(0 10px 10px rgba(172, 68, 98, .15));
+        }
+
+        .birthday-sparkle {
+            position: absolute;
+            font-size: 22px;
+            animation: sparkle 1.2s ease-in-out infinite alternate;
+        }
+        .birthday-sparkle.s1 { left: 2px; top: 14px; }
+        .birthday-sparkle.s2 { right: -2px; top: 24px; animation-delay: .25s; }
+        .birthday-sparkle.s3 { right: 10px; bottom: 8px; animation-delay: .5s; }
+
+        .birthday-surprise-text {
+            margin: 4px auto 0;
+            max-width: 430px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #725a64;
+        }
+
+        .surprise-close-btn {
+            margin-top: 18px;
+            min-height: 44px;
+            padding: 0 22px;
+            border: 0;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 800;
+            color: #fff;
+            background: linear-gradient(135deg, #ef86a2, #d94269);
+            box-shadow: 0 10px 25px rgba(215, 66, 105, .2);
+        }
+
+        .surprise-continue-btn {
+            display: block;
+            margin: 10px auto 0;
+            min-height: 42px;
+            padding: 0 20px;
+            border: 1px solid #e9b8c7;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 800;
+            color: #9b3e5d;
+            background: #fff;
+        }
+
+        @keyframes surpriseCardPop {
+            0% { transform: translateY(26px) scale(.75); opacity: 0; }
+            60% { transform: translateY(-4px) scale(1.04); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes cakeFloat {
+            0%,100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-7px) rotate(2deg); }
+        }
+
+        @keyframes sparkle {
+            from { transform: scale(.8) rotate(-8deg); opacity: .55; }
+            to { transform: scale(1.18) rotate(8deg); opacity: 1; }
+        }
+
+        @media (max-width: 700px) {
+            .birthday-surprise-card {
+                padding: 24px 16px 20px;
+                border-radius: 26px;
+            }
+            .birthday-cake-wrap {
+                width: 100px;
+                height: 100px;
+            }
+            .birthday-cake-main { font-size: 64px; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="birthday-game" id="birthdayGame">
+    <div class="birthday-card">
+
+        <div class="heading">
+            <div class="small-title">AIM FOR MY HEART ❤️</div>
+            <h1>Pull • Aim • Release 💘</h1>
+            <p>
+                Arrow ke pink feather ko pakdo, left side peeche kheecho,
+                heart par aim karo aur release kar do.
+            </p>
+        </div>
+
+        <div class="game-area">
+
+            <svg id="gameSvg" viewBox="0 0 920 390">
+
+                <!-- Lower ellipse -->
+                <ellipse
+                    cx="455"
+                    cy="340"
+                    rx="305"
+                    ry="20"
+                    fill="#f1dfe5"
+                    opacity="0.75"
+                />
+
+                <text x="55" y="48" class="small-label">PULL ARROW ←</text>
+                <text x="790" y="48" class="small-label">TARGET ❤️</text>
+
+                <!-- Bow -->
+                <g id="bow">
+
+                    <path
+                        class="bow-main"
+                        d="
+                        M300 78
+                        C309 88 309 94 320 104
+                        C332 114 351 119 367 129
+                        C387 141 391 156 384 167
+                        C378 175 366 179 349 180
+                        C366 181 378 185 384 193
+                        C391 204 387 219 367 231
+                        C351 241 332 246 320 256
+                        C309 266 309 272 300 282
+                        "
+                    />
+
+                    <path
+                        class="bow-highlight"
+                        d="
+                        M303 87
+                        C312 95 313 101 324 110
+                        C336 119 353 124 367 133
+                        C381 143 384 155 378 165
+                        C372 173 362 176 349 177
+                        "
+                    />
+
+                    <path
+                        class="bow-highlight"
+                        d="
+                        M349 183
+                        C362 184 372 188 378 196
+                        C384 206 381 218 367 227
+                        C353 236 336 241 324 250
+                        C313 259 312 265 303 273
+                        "
+                    />
+
+                    <path
+                        class="bow-tip"
+                        d="
+                        M300 78
+                        C291 69 279 64 270 67
+                        C269 78 273 89 285 96
+                        C290 90 295 84 300 78
+                        Z
+                        "
+                    />
+
+                    <path
+                        class="bow-tip"
+                        d="
+                        M300 282
+                        C291 291 279 296 270 293
+                        C269 282 273 271 285 264
+                        C290 270 295 276 300 282
+                        Z
+                        "
+                    />
+
+                    <path
+                        class="bow-tip-highlight"
+                        d="
+                        M296 82
+                        C290 80 284 79 280 80
+                        C282 86 286 89 290 92
+                        Z
+                        "
+                    />
+
+                    <path
+                        class="bow-tip-highlight"
+                        d="
+                        M296 278
+                        C290 280 284 281 280 280
+                        C282 274 286 271 290 268
+                        Z
+                        "
+                    />
+
+                    <path
+                        class="bow-handle"
+                        d="
+                        M347 160
+                        C359 162 364 169 361 180
+                        C364 191 359 198 347 200
+                        L334 195
+                        C339 186 339 174 334 165
+                        Z
+                        "
+                    />
+
+                    <line class="handle-line" x1="340" y1="168" x2="354" y2="172" />
+                    <line class="handle-line" x1="339" y1="175" x2="356" y2="179" />
+                    <line class="handle-line" x1="339" y1="182" x2="356" y2="186" />
+                    <line class="handle-line" x1="340" y1="189" x2="353" y2="193" />
+
+                    <polyline
+                        id="bowString"
+                        class="bow-string"
+                        points="270,82 270,180 270,278"
+                    />
+                </g>
+
+                <!-- Aim line -->
+                <line
+                    id="aimLine"
+                    class="aim-line"
+                    x1="270"
+                    y1="180"
+                    x2="860"
+                    y2="180"
+                />
+
+                <!-- Arrow -->
+                <g id="arrow">
+                    <circle class="arrow-nock" cx="270" cy="180" r="4" />
+                    <line class="arrow-shaft" x1="270" y1="180" x2="460" y2="180" />
+                    <polygon class="arrow-head" points="460,169 485,180 460,191" />
+                    <polygon class="arrow-feather" points="277,180 244,161 262,179" />
+                    <polygon class="arrow-feather" points="277,180 244,199 262,181" />
+                    <circle id="dragZone" class="drag-zone" cx="255" cy="180" r="42" />
+                </g>
+
+                <!-- Heart -->
+                <g id="heartTarget" class="heart-target">
+                    <circle class="heart-ring" cx="725" cy="180" r="84" />
+                    <circle class="heart-ring" cx="725" cy="180" r="64" />
+
+                    <path
+                        class="heart-main"
+                        d="
+                        M725 238
+                        C710 221 671 196 663 167
+                        C656 140 673 123 695 126
+                        C710 127 720 137 725 149
+                        C730 137 740 127 755 126
+                        C777 123 794 140 787 167
+                        C779 196 740 221 725 238
+                        Z
+                        "
+                    />
+
+                    <circle class="heart-center" cx="725" cy="180" r="7" />
+                </g>
+
+                <!-- Vertical power bar -->
+                <g id="powerMeterGroup">
+                    <text x="44" y="142" class="small-label">POWER</text>
+
+                    <rect
+                        class="power-bg"
+                        x="48"
+                        y="150"
+                        width="16"
+                        height="126"
+                        rx="8"
+                    />
+
+                    <rect
+                        id="powerBar"
+                        class="power-fill"
+                        x="48"
+                        y="258"
+                        width="16"
+                        height="18"
+                        rx="8"
+                    />
+                </g>
+
+                <text
+                    id="helpText"
+                    x="340"
+                    y="343"
+                    class="main-label"
+                >
+                    Pull the arrow backwards
+                </text>
+
+            </svg>
+
+        </div>
+
+        <div class="status" id="status">
+            🏹 Pink feather ko pakadkar left side kheecho.
+        </div>
+
+        <div class="controls">
+            <button type="button" class="game-btn shoot-button" id="autoShoot">
+                💘 Shoot For Me
+            </button>
+
+            <button type="button" class="game-btn reset-button" id="resetButton">
+                ↻ Try Again
+            </button>
+        </div>
+
+        <div class="message-section">
+            <div class="locked-message" id="lockedMessage">
+                ❤️ Heart ko hit karo aur surprise unlock karo.
+            </div>
+
+            <div class="birthday-message" id="birthdayMessage">
+                <h2>Happy Birthday! 🎉</h2>
+                <p>
+                    May your special day be filled with love, happiness,
+                    laughter and beautiful memories. May every wish in your
+                    heart come true. ❤️
+                </p>
+                <span class="cake">🎂✨</span>
+            </div>
+        </div>
+
+
+
+        <div class="birthday-surprise-overlay" id="birthdayOverlay" aria-hidden="true">
+            <div class="birthday-surprise-card" role="dialog" aria-modal="true" aria-label="Birthday surprise">
+                <div class="birthday-surprise-kicker">A LITTLE SURPRISE FOR YOU</div>
+                <h2 class="birthday-surprise-title">
+                    Happy Birthday
+                    <span class="birthday-name" id="birthdayName">Samestha</span>
+                </h2>
+
+                <div class="birthday-cake-wrap" aria-hidden="true">
+                    <span class="birthday-sparkle s1">✨</span>
+                    <span class="birthday-sparkle s2">💖</span>
+                    <span class="birthday-cake-main">🎂</span>
+                    <span class="birthday-sparkle s3">✨</span>
+                </div>
+
+                <p class="birthday-surprise-text">
+                   Happy Birthday, Yaar! 🎂🥳❤️ Wishing you lots of happiness, success and good health. Hamesha khush reh, aise hi hasta-muskurata reh aur life mein khoob tarakki kar. Enjoy your day to the fullest! 🎉🎈
+                </p>
+
+                <button type="button" class="surprise-close-btn" id="surpriseCloseBtn">💘 Fall for Me Again</button>
+                <button type="button" class="surprise-continue-btn" id="continueWishBtn">Continue to your wish →</button>
+            </div>
+        </div>
+
+        <div class="confetti-container" id="confetti"></div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const root = document.getElementById("birthdayGame");
+    const svg = document.getElementById("gameSvg");
+    const arrow = document.getElementById("arrow");
+    const dragZone = document.getElementById("dragZone");
+    const bowString = document.getElementById("bowString");
+    const aimLine = document.getElementById("aimLine");
+    const powerBar = document.getElementById("powerBar");
+    const helpText = document.getElementById("helpText");
+    const status = document.getElementById("status");
+    const autoShoot = document.getElementById("autoShoot");
+    const resetButton = document.getElementById("resetButton");
+    const lockedMessage = document.getElementById("lockedMessage");
+    const birthdayMessage = document.getElementById("birthdayMessage");
+    const confetti = document.getElementById("confetti");
+    const heartTarget = document.getElementById("heartTarget");
+    const birthdayOverlay = document.getElementById("birthdayOverlay");
+    const birthdayName = document.getElementById("birthdayName");
+    const surpriseCloseBtn = document.getElementById("surpriseCloseBtn");
+    const continueWishBtn = document.getElementById("continueWishBtn");
+
+    // Change only this value for the birthday person's name.
+    const BIRTHDAY_NAME = "Samestha";
+    birthdayName.textContent = BIRTHDAY_NAME + "❤️";
+
+    const STRING_TOP = { x: 270, y: 82 };
+    const STRING_BOTTOM = { x: 270, y: 278 };
+    const REST = { x: 270, y: 180 };
+    const AIM_REFERENCE = { x: 390, y: 180 };
+    const HEART = { x: 725, y: 180, radius: 52 };
+    const ARROW_LENGTH = 220;
+
+    const POWER_BG_Y = 150;
+    const POWER_BG_HEIGHT = 126;
+    const POWER_MIN_HEIGHT = 18;
+    const POWER_MAX_EXTRA = 108;
+
+    const HEART_FLOAT_AMPLITUDE = 18;
+    const HEART_FLOAT_SPEED = 0.0022;
+    const HEART_BEAT_SPEED = 0.0086;
+    const HEART_BEAT_STRENGTH = 0.085;
+
+    let nock = { ...REST };
+    let dragging = false;
+    let flying = false;
+    let animationFrame = null;
+    let heartMotionFrame = null;
+    let currentHeartOffsetY = 0;
+    let currentHeartScale = 1;
+
+    function getSvgPoint(event) {
+        const point = svg.createSVGPoint();
+        point.x = event.clientX;
+        point.y = event.clientY;
+        const matrix = svg.getScreenCTM();
+        if (!matrix) return REST;
+        return point.matrixTransform(matrix.inverse());
+    }
+
+    function getArrowDirection(x, y) {
+        const dx = AIM_REFERENCE.x - x;
+        const dy = AIM_REFERENCE.y - y;
+        const angle = Math.atan2(dy, dx);
+
+        return {
+            angle: angle,
+            ux: Math.cos(angle),
+            uy: Math.sin(angle)
+        };
+    }
+
+
+    function applyHeartTransform(offsetY, scale) {
+        heartTarget.setAttribute(
+            "transform",
+            `translate(0 ${offsetY.toFixed(2)}) translate(${HEART.x} ${HEART.y}) scale(${scale.toFixed(3)}) translate(${-HEART.x} ${-HEART.y})`
+        );
+    }
+
+    function animateHeart(currentTime) {
+        currentHeartOffsetY = Math.sin(currentTime * HEART_FLOAT_SPEED) * HEART_FLOAT_AMPLITUDE;
+        const beatWave = Math.max(0, Math.sin(currentTime * HEART_BEAT_SPEED));
+        currentHeartScale = 1 + (beatWave * HEART_BEAT_STRENGTH) + (Math.sin(currentTime * HEART_BEAT_SPEED * 0.5) * 0.012);
+
+        applyHeartTransform(currentHeartOffsetY, currentHeartScale);
+        heartMotionFrame = requestAnimationFrame(animateHeart);
+    }
+
+    function startHeartMotion() {
+        if (heartMotionFrame) {
+            cancelAnimationFrame(heartMotionFrame);
+        }
+        heartMotionFrame = requestAnimationFrame(animateHeart);
+    }
+
+    function drawArrow(x, y) {
+        nock.x = x;
+        nock.y = y;
+
+        const direction = getArrowDirection(x, y);
+        const degree = direction.angle * 180 / Math.PI;
+
+        arrow.setAttribute(
+            "transform",
+            `translate(${x - REST.x} ${y - REST.y}) rotate(${degree} ${REST.x} ${REST.y})`
+        );
+
+        bowString.setAttribute(
+            "points",
+            `${STRING_TOP.x},${STRING_TOP.y} ${x},${y} ${STRING_BOTTOM.x},${STRING_BOTTOM.y}`
+        );
+
+        aimLine.setAttribute("x1", x);
+        aimLine.setAttribute("y1", y);
+        aimLine.setAttribute("x2", x + direction.ux * 580);
+        aimLine.setAttribute("y2", y + direction.uy * 580);
+
+        const pull = Math.max(0, Math.min(1, (REST.x - x) / 120));
+
+        const fillHeight = POWER_MIN_HEIGHT + (pull * POWER_MAX_EXTRA);
+        const fillY = POWER_BG_Y + POWER_BG_HEIGHT - fillHeight;
+
+        powerBar.setAttribute("height", fillHeight);
+        powerBar.setAttribute("y", fillY);
+
+        if (pull > 0.8) {
+            helpText.textContent = "🔥 Full power — Release!";
+        } else if (pull > 0.4) {
+            helpText.textContent = "🎯 Aim at heart & release";
+        } else {
+            helpText.textContent = "Pull farther back";
+        }
+    }
+
+    function startDrag(event) {
+        if (flying) return;
+        event.preventDefault();
+        dragging = true;
+        dragZone.setPointerCapture?.(event.pointerId);
+        aimLine.classList.add("show");
+        status.textContent = "🎯 Heart par aim karo aur release karo.";
+    }
+
+    function dragArrow(event) {
+        if (!dragging || flying) return;
+
+        const point = getSvgPoint(event);
+
+        const x = Math.max(115, Math.min(REST.x, point.x));
+        const y = Math.max(135, Math.min(225, point.y));
+
+        drawArrow(x, y);
+    }
+
+    function releaseArrow() {
+        if (!dragging || flying) return;
+
+        dragging = false;
+
+        const pullDistance = REST.x - nock.x;
+
+        if (pullDistance < 25) {
+            status.textContent = "↩️ Arrow ko thoda aur peeche kheecho.";
+            resetGame(false);
+            return;
+        }
+
+        shootArrow(false);
+    }
+
+    function shootArrow(autoMode) {
+        if (flying) return;
+
+        flying = true;
+        autoShoot.disabled = true;
+        aimLine.classList.remove("show");
+
+        if (autoMode) {
+            drawArrow(135, 180);
+            status.textContent = "💘 Perfect shot...";
+        }
+
+        const startingPoint = { x: nock.x, y: nock.y };
+        const direction = getArrowDirection(startingPoint.x, startingPoint.y);
+        const degree = direction.angle * 180 / Math.PI;
+        const pullDistance = Math.max(35, REST.x - startingPoint.x);
+        const speed = 520 + pullDistance * 4.8;
+
+        let x = startingPoint.x;
+        let y = startingPoint.y;
+        let previousTime = performance.now();
+
+        function animate(currentTime) {
+            const delta = Math.min(0.025, (currentTime - previousTime) / 1000);
+            previousTime = currentTime;
+
+            x += direction.ux * speed * delta;
+            y += direction.uy * speed * delta;
+
+            arrow.setAttribute(
+                "transform",
+                `translate(${x - REST.x} ${y - REST.y}) rotate(${degree} ${REST.x} ${REST.y})`
+            );
+
+            bowString.setAttribute(
+                "points",
+                `${STRING_TOP.x},${STRING_TOP.y} ${REST.x},${REST.y} ${STRING_BOTTOM.x},${STRING_BOTTOM.y}`
+            );
+
+            const tipX = x + ARROW_LENGTH * direction.ux;
+            const tipY = y + ARROW_LENGTH * direction.uy;
+
+            const currentHeartY = HEART.y + currentHeartOffsetY;
+            const currentHeartRadius = HEART.radius * currentHeartScale;
+            const distance = Math.hypot(tipX - HEART.x, tipY - currentHeartY);
+
+            if (distance < currentHeartRadius) {
+                flying = false;
+                heartHit();
+                return;
+            }
+
+            if (tipX > 905 || tipY < 15 || tipY > 360) {
+                flying = false;
+                status.textContent = "💔 Missed! Aim again.";
+                setTimeout(function () {
+                    resetGame(false);
+                }, 800);
+                return;
+            }
+
+            animationFrame = requestAnimationFrame(animate);
+        }
+
+        animationFrame = requestAnimationFrame(animate);
+    }
+
+    function heartHit() {
+        root.classList.add("hit");
+        status.textContent = "🎯 Bullseye! Birthday surprise unlocked!";
+        lockedMessage.style.display = "none";
+        birthdayMessage.classList.remove("show");
+        birthdayOverlay.classList.add("show");
+        birthdayOverlay.setAttribute("aria-hidden", "false");
+        createConfetti();
+        autoShoot.disabled = false;
+    }
+
+    function createConfetti() {
+        confetti.innerHTML = "";
+
+        const colors = ["#df5575", "#ffd166", "#9b8de2", "#75cdbb", "#ffa17c", "#efabc0"];
+
+        for (let i = 0; i < 70; i++) {
+            const piece = document.createElement("span");
+            piece.className = "confetti-piece";
+
+            piece.style.left = (72 + Math.random() * 18) + "%";
+            piece.style.top = (28 + Math.random() * 20) + "%";
+            piece.style.background = colors[i % colors.length];
+
+            piece.style.setProperty("--move-x", (((Math.random() - 0.5) * 700)) + "px");
+            piece.style.setProperty("--move-y", (120 + Math.random() * 340) + "px");
+            piece.style.setProperty("--rotate", (((Math.random() - 0.5) * 1000)) + "deg");
+
+            piece.style.animationDelay = (Math.random() * 0.2) + "s";
+
+            confetti.appendChild(piece);
+        }
+    }
+
+    function resetGame(showMessage = true) {
+        if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+        }
+
+        flying = false;
+        dragging = false;
+
+        root.classList.remove("hit");
+        aimLine.classList.remove("show");
+        confetti.innerHTML = "";
+        birthdayMessage.classList.remove("show");
+        birthdayOverlay.classList.remove("show");
+        birthdayOverlay.setAttribute("aria-hidden", "true");
+        lockedMessage.style.display = "block";
+        autoShoot.disabled = false;
+
+        currentHeartOffsetY = 0;
+        currentHeartScale = 1;
+        drawArrow(REST.x, REST.y);
+
+        if (showMessage) {
+            status.textContent = "🏹 Pink feather ko pakadkar left side kheecho.";
+        }
+    }
+
+    dragZone.addEventListener("pointerdown", startDrag);
+    svg.addEventListener("pointermove", dragArrow);
+    svg.addEventListener("pointerup", releaseArrow);
+    svg.addEventListener("pointercancel", releaseArrow);
+
+    autoShoot.addEventListener("click", function () {
+        resetGame(false);
+        setTimeout(function () {
+            shootArrow(true);
+        }, 60);
+    });
+    resetButton.addEventListener("click", function () {
+        resetGame(true);
+    });
+
+    surpriseCloseBtn.addEventListener("click", function () {
+        resetGame(true);
+    });
+
+    continueWishBtn.addEventListener("click", function () {
+        window.parent.postMessage({ type: "heart-arrow-continue" }, window.location.origin);
+    });
+
+    startHeartMotion();
+    resetGame(true);
+});
+</script>
+
+</body>
+</html>
